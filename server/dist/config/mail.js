@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.SMTP_PASSWORD,
     },
 });
-export const sendMail = async (to, subject, body) => {
+export const sendEMail = async (to, subject, body) => {
     // send mail with defined transport object
     try {
         await transporter.sendMail({
@@ -19,5 +19,6 @@ export const sendMail = async (to, subject, body) => {
         });
     }
     catch (error) {
+        console.log(error);
     }
 };

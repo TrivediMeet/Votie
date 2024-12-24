@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer";
 
 
 const transporter = nodemailer.createTransport({
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     },
   });
 
-  export const  sendMail = async (to:string ,subject:string , body:string) => {
+  export const  sendEMail = async (to:string ,subject:string , body:string) => {
     // send mail with defined transport object
     try {
       await transporter.sendMail({
@@ -21,6 +21,6 @@ const transporter = nodemailer.createTransport({
         html: body, 
       });
     } catch (error) {
-        
+        console.log(error);
     }
   }
