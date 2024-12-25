@@ -5,7 +5,7 @@ export const  redisConnection:ConnectionOptions = {
     port: 6379,
 }
 
-export const defaultQueueConfig: DefaultJobOptions = {
+export const defaultQueueOptions: DefaultJobOptions = {
     removeOnComplete:{
         count:20,
         age:60*60,
