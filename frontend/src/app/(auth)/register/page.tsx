@@ -5,6 +5,9 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { registerAction } from "@/actions/authActions";
+import { SubmitButton } from "@/components/common/SubmitButton";
+import Register from "@/components/auth/Register";
 
 
 export default async function register() {
@@ -19,29 +22,9 @@ export default async function register() {
           <h1 className="text-3xl font-bold">Register</h1>
           <p>Start clashing now</p>
         </div>
-        <form >
-        <div className="mt-4">
-                <label htmlFor="name">Name</label>
-                <Input id="name" type="text" name="name" placeholder="Enter your name"></Input>
-            </div>
-            <div className="mt-4">
-                <label htmlFor="email">Email</label>
-                <Input id="email" type="email" name="email" placeholder="Enter your email"></Input>
-            </div>
-            <div className="mt-4">
-                <label htmlFor="password">Password</label>
-                <Input id="password" type="password" name="password" placeholder="Enter your password"></Input>
-            </div>
-            <div className="mt-4">
-                <label htmlFor="cpassword">Confirm Password</label>
-                <Input id="cpassword" type="password" name="confirm_password" placeholder="Confirm your password"></Input>
-            </div>
-            
-          
-            <div className="mt-4">
-                <Button className="w-full">Submit</Button>
-            </div>
-          </form>
+
+        <Register></Register>
+   
         <p className="text-center mt-2">
           Already have an account ?{" "}
           <strong>
