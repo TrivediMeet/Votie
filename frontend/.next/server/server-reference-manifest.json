@@ -1,11 +1,8 @@
 {
   "node": {
-    "601bddeb39aabd89574e44340b710839a3528e6121": {
+    "0109970ad01e17889c56dbf7378f7992c9b75187": {
       "workers": {
-        "app/(auth)/register/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5CProjects%5C%5CVotiee%5C%5Cfrontend%5C%5Csrc%5C%5Cactions%5C%5CauthActions.ts%22%2C%5B%5B%22601bddeb39aabd89574e44340b710839a3528e6121%22%2C%22registerAction%22%5D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
+        "app/(auth)/register/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5CProjects%5C%5CVotiee%5C%5Cfrontend%5C%5Csrc%5C%5Cactions%5C%5CauthActions.ts%22%2C%5B%22registerAction%22%5D%5D%5D&__client_imported__=true!"
       },
       "layer": {
         "app/(auth)/register/page": "action-browser"
@@ -13,5 +10,5 @@
     }
   },
   "edge": {},
-  "encryptionKey": "+6G1uPjY5z5QJQMGmoj++UQOlbTVJ8Q3+PBXFt81WLo="
+  "encryptionKey": "nuXRzZGwKVtEkZ3KGOM/Bn1F1koS470nWN3Zg0UrgbI="
 }

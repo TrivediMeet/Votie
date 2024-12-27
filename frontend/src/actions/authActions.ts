@@ -1,38 +1,39 @@
-"use server"
+"use server";
 
-import { REGISTER_URL } from "@/lib/apiEndPoints"
-import axios, { AxiosError } from "axios"
-
-export async function registerAction(prevState:any,formData: FormData) {
-
-
-    
+import { REGISTER_URL } from "@/lib/apiEndPoints";
+import axios, { AxiosError } from "axios";
+export async function registerAction(prevState: any, formData: FormData) {
     try {
-
-  const {data} =await axios.post(REGISTER_URL, formData);
-    return {
+      const response = await axios.post(REGISTER_URL, {
+        name: formData.get("name"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+        confirm_password: formData.get("confirm_password"),
+      });
+  
+      return {
         status: 200,
-        message: data?.message ?? "Account created successfully. Please check your email to verify your account.",
+        message: response.data.message,
         errors: {},
-    }
-} catch (error) {
-
-    if(error instanceof AxiosError)
-    {
-        if(error.response?.status===422)
-        {
-            return {
-                status: 422,
-                message: error.response?.data?.message,
-                errors: error.response?.data?.errors,
-            };
+      };
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log("Error Response Data:", error.response?.data); // Debug the response
+        if (error.response?.status === 422) {
+          return {
+            status: 422,
+            message: error.response.data.message,
+            errors: error.response.data.errors, // Pass errors to the frontend
+          };
         }
-    }
-    return{
+      }
+      return {
         status: 500,
         message: "Something went wrong. Please try again!",
         errors: {},
-    };
+      };
+    }
   }
   
-}
+  
+  

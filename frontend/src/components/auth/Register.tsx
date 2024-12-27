@@ -1,68 +1,79 @@
 "use client";
-
-import { registerAction } from "@/actions/authActions";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import { Label } from "@/components/ui/label";
 import { SubmitButton } from "../common/SubmitButton";
 import { useFormState } from "react-dom";
+import { registerAction } from "@/actions/authActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { REGISTER_URL } from "@/lib/apiEndPoints";
 
-const Register = () => {
-  const initState = {
-    status: 0,
+export default function Register() {
+  const router = useRouter();
+  const initialState = {
     message: "",
+    status: 0,
     errors: {},
   };
+  const [state, formAction] = useFormState(registerAction, initialState);
 
-  const [state, formAction] = useFormState(registerAction, initState);
+  // useEffect(() => {
+  //   console.log("State Errors:", state.errors); 
+  //   console.log("Making request to:", REGISTER_URL);// Debug errors
+    
+  // }, [state.errors]);
+  useEffect(() => {
+    if (state.status === 404) {
+      toast.error(state.message);
+    } else if (state.status === 200) {
+      toast.success(state.message);
+    }
+  }, [state]);
+  
+
   return (
     <form action={formAction}>
-      <div className="mt-4">
-        <label htmlFor="name">Name</label>
-        <Input
-          id="name"
-          type="text"
-          name="name"
-          placeholder="Enter your name"
-        ></Input>
+  <div className="mt-4">
+    <Label htmlFor="name">Name</Label>
+    <Input placeholder="Type your name" name="name" />
+    {state.errors?.name && (
+      <span className="text-red-400">{state.errors.name}</span>
+    )}
+  </div>
+  <div className="mt-4">
+    <Label htmlFor="email">Email</Label>
+    <Input placeholder="Type your email" name="email" />
+    {state.errors?.email && (
+      <span className="text-red-400">{state.errors.email}</span>
+    )}
+  </div>
+  <div className="mt-4">
+    <Label htmlFor="password">Password</Label>
+    <Input
+      type="password"
+      placeholder="Type your password"
+      name="password"
+    />
+    {state.errors?.password && (
+      <span className="text-red-400">{state.errors.password}</span>
+    )}
+  </div>
+  <div className="mt-4">
+    <Label htmlFor="cpassword">Confirm Password</Label>
+    <Input
+      type="password"
+      placeholder="Type your password"
+      name="confirm_password"
+    />
+    {state.errors?.confirm_password && (
+      <span className="text-red-400">{state.errors.confirm_password}</span>
+    )}
+  </div>
+  <div className="mt-4">
+    <SubmitButton />
+  </div>
+</form>
 
-        <span className="text-red-500">{state.errors?.name}</span>
-      </div>
-      <div className="mt-4">
-        <label htmlFor="email">Email</label>
-        <Input
-          id="email"
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-        ></Input>
-        <span className="text-red-500">{state.errors?.email}</span>
-      </div>
-      <div className="mt-4">
-        <label htmlFor="password">Password</label>
-        <Input
-          id="password"
-          type="password"
-          name="password"
-          placeholder="Enter your password"
-        ></Input>
-        <span className="text-red-500">{state.errors?.password}</span>
-      </div>
-      <div className="mt-4">
-        <label htmlFor="cpassword">Confirm Password</label>
-        <Input
-          id="cpassword"
-          type="password"
-          name="confirm_password"
-          placeholder="Confirm your password"
-        ></Input>
-        <span className="text-red-500">{state.errors?.confirm_password}</span>
-      </div>
-
-      <div className="mt-4">
-        <SubmitButton></SubmitButton>
-      </div>
-    </form>
   );
-};
-
-export default Register;
+}
