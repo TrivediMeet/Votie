@@ -1,15 +1,70 @@
-import { Router, Request, Response } from "express";
-import { registerSchema } from "../validation/authValidation.js";
-import { tryCatch } from "bullmq";
+import { Router } from "express";
+import { Request, Response } from "express-serve-static-core";
+import { loginschema, registerSchema } from "../validation/authValidation.js";
 import { ZodError } from "zod";
 import { formateError, renderEmailEjs } from "../helper.js";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { v4 as uuid4 } from "uuid";
+import jwt from "jsonwebtoken";
 
 import { emailQueue, emailQueueName } from "../jobs/EmailJobs.js";
+import prisma from "../config/database.js";
 
 const router = Router();
+
+// * Login route
+
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
+    const payload = loginschema.parse(body);
+    // * check email
+    let user = await prisma.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    })
+
+    if(!user || user ===null)
+    {
+      return res.status(422).json({
+        errors: {
+          message: "No user found with this email",
+        },
+      })
+
+    }
+
+    //* check password
+    const compare = await bcrypt.compare(payload.password, user.password)
+    if(!compare)
+    {
+      return res.status(422).json({
+        errors: {
+          message: "Invalid Credentials",
+        },
+      })
+    }
+
+    // * JWT payload
+    const JWTpayload = {
+      id:user.id,
+      name:user.name,
+      email:user.email
+    }
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const errors = formateError(error);
+      res.status(422).json({ message: "Invalid data", errors });
+    } else {
+      console.error({ type: "Register Error", body: JSON.stringify(error) });
+      res
+        .status(500)
+        .json({ error: "Something went wrong.please try again!", data: error });
+    }
+  }
+});
 
 // * Register route
 
