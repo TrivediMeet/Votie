@@ -11,78 +11,87 @@ import jwt from "jsonwebtoken";
 import { emailQueue, emailQueueName } from "../jobs/EmailJobs.js";
 import prisma from "../config/database.js";
 import authMiddleware from "../middleware/AuthMiddleware.js";
+import { authLimiter } from "../config/rate_limit.js";
 
 const router = Router();
 
 // * Login route
 
-router.post("/login", async (req: Request, res: Response): Promise<void> => {
-  try {
-    const body = req.body;
-    const payload = loginschema.parse(body);
-    // * check email
-    let user = await prisma.user.findUnique({
-      where: {
-        email: payload.email,
-      },
-    });
+router.post(
+  "/login",
+  authLimiter,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const body = req.body;
+      const payload = loginschema.parse(body);
+      // * check email
+      let user = await prisma.user.findUnique({
+        where: {
+          email: payload.email,
+        },
+      });
 
-    if (!user || user === null) {
-      res.status(422).json({
-        errors: {
-          message: "No user found with this email",
+      if (!user || user === null) {
+        res.status(422).json({
+          errors: {
+            message: "No user found with this email",
+          },
+        });
+        return;
+      }
+
+      //* check password
+      const compare = await bcrypt.compare(payload.password, user.password);
+      if (!compare) {
+        res.status(422).json({
+          errors: {
+            message: "Invalid Credentials",
+          },
+        });
+        return;
+      }
+
+      // * JWT payload
+      let JWTpayload = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      };
+
+      const token = jwt.sign(JWTpayload, process.env.SECRET_KEY!, {
+        expiresIn: "365d",
+      });
+      res.json({
+        message: "Login successful",
+        data: {
+          ...JWTpayload,
+          token: `Bearer ${token}`,
         },
       });
       return;
-    }
-
-    //* check password
-    const compare = await bcrypt.compare(payload.password, user.password);
-    if (!compare) {
-      res.status(422).json({
-        errors: {
-          message: "Invalid Credentials",
-        },
-      });
-      return;
-    }
-
-    // * JWT payload
-    let JWTpayload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    };
-
-    const token = jwt.sign(JWTpayload, process.env.SECRET_KEY!, {
-      expiresIn: "365d",
-    });
-    res.json({
-      message: "Login successful",
-      data: {
-        ...JWTpayload,
-        token: `Bearer ${token}`,
-      },
-    });
-    return;
-  } catch (error) {
-    if (error instanceof ZodError) {
-      const errors = formateError(error);
-      res.status(422).json({ message: "Invalid data", errors });
-    } else {
-      console.error({ type: "Register Error", body: JSON.stringify(error) });
-      res
-        .status(500)
-        .json({ error: "Something went wrong.please try again!", data: error });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = formateError(error);
+        res.status(422).json({ message: "Invalid data", errors });
+      } else {
+        console.error({ type: "Register Error", body: JSON.stringify(error) });
+        res
+          .status(500)
+          .json({
+            error: "Something went wrong.please try again!",
+            data: error,
+          });
+      }
     }
   }
-});
+);
 
 //* Login Check route
 
 router.post(
   "/check/credentials",
-  async (req: Request, res: Response): Promise<void> => {
+  authLimiter,
+  async (req: Request, res: Response) => {
     try {
       const body = req.body;
       const payload = loginschema.parse(body);
@@ -121,15 +130,16 @@ router.post(
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = formateError(error);
+
         res.status(422).json({ message: "Invalid data", errors });
+        return;
       } else {
         console.error({ type: "Register Error", body: JSON.stringify(error) });
-        res
-          .status(500)
-          .json({
-            error: "Something went wrong.please try again!",
-            data: error,
-          });
+        res.status(500).json({
+          error: "Something went wrong.please try again!",
+          data: error,
+        });
+        return;
       }
     }
   }
@@ -137,7 +147,7 @@ router.post(
 
 // * Register route
 
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", authLimiter, async (req: Request, res: Response) => {
   try {
     const body = req.body;
     const payload = registerSchema.parse(body);

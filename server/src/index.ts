@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 7000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use(appLimiter);
 // Set view engine
 app.set("view engine", "ejs");
 app.set("views", path.resolve(__dirname, "./views"));
@@ -31,7 +31,8 @@ app.get(
       const html = await ejs.renderFile(path.join(__dirname, "views", "emails", "welcome.ejs"), { name: "Root" });
       // await sendEMail(" fayece4297@owube.com","Testing",html);
      await emailQueue.add(emailQueueName,{to:"fayece4297@owube.com",subject:"Testinggg",body:html});
-      return res.json({ msg: "Email Sent" });
+     res.json({ msg: "Email Sent" });
+      return 
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json({ msg: "Email Failed", error });
@@ -43,6 +44,7 @@ app.get(
 
 import "./jobs/EmailJobs.js";
 import { emailQueue, emailQueueName } from "./jobs/EmailJobs.js";
+import { appLimiter } from "./config/rate_limit.js";
 
 
 // Start the server

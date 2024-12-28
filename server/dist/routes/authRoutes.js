@@ -9,9 +9,10 @@ import jwt from "jsonwebtoken";
 import { emailQueue, emailQueueName } from "../jobs/EmailJobs.js";
 import prisma from "../config/database.js";
 import authMiddleware from "../middleware/AuthMiddleware.js";
+import { authLimiter } from "../config/rate_limit.js";
 const router = Router();
 // * Login route
-router.post("/login", async (req, res) => {
+router.post("/login", authLimiter, async (req, res) => {
     try {
         const body = req.body;
         const payload = loginschema.parse(body);
@@ -66,12 +67,15 @@ router.post("/login", async (req, res) => {
             console.error({ type: "Register Error", body: JSON.stringify(error) });
             res
                 .status(500)
-                .json({ error: "Something went wrong.please try again!", data: error });
+                .json({
+                error: "Something went wrong.please try again!",
+                data: error,
+            });
         }
     }
 });
 //* Login Check route
-router.post("/check/credentials", async (req, res) => {
+router.post("/check/credentials", authLimiter, async (req, res) => {
     try {
         const body = req.body;
         const payload = loginschema.parse(body);
@@ -109,20 +113,20 @@ router.post("/check/credentials", async (req, res) => {
         if (error instanceof ZodError) {
             const errors = formateError(error);
             res.status(422).json({ message: "Invalid data", errors });
+            return;
         }
         else {
             console.error({ type: "Register Error", body: JSON.stringify(error) });
-            res
-                .status(500)
-                .json({
+            res.status(500).json({
                 error: "Something went wrong.please try again!",
                 data: error,
             });
+            return;
         }
     }
 });
 // * Register route
-router.post("/register", async (req, res) => {
+router.post("/register", authLimiter, async (req, res) => {
     try {
         const body = req.body;
         const payload = registerSchema.parse(body);
