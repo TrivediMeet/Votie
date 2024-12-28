@@ -213,9 +213,10 @@ router.post("/register", authLimiter, async (req: Request, res: Response) => {
 
 router.get("/user", authMiddleware, async (req: Request, res: Response) => {
   const user = req.user;
-  return res.json({
+  res.json({
     data: user,
   });
+  return 
 });
 
 export default router;

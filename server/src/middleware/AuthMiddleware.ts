@@ -6,10 +6,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
     if(authHeader === null || authHeader===undefined)
     {
-        return res.status(401).json({
+        res.status(401).json({
             status:401,
             message:"Unauthorized"
         })
+        return 
     }
 
     const token = authHeader.split(" ")[1]
@@ -20,10 +21,11 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
         if(err)
         {
-            return res.status(401).json({
+            res.status(401).json({
                 status:401,
                 message:"Unauthorized"
             })
+            return 
         }
 
         /* if everything is good, save to request for use in other routes */
