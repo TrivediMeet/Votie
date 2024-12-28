@@ -24,7 +24,7 @@ export default function Register() {
     
   // }, [state.errors]);
   useEffect(() => {
-    if (state.status === 404) {
+    if (state.status === 500) {
       toast.error(state.message);
     } else if (state.status === 200) {
       toast.success(state.message);

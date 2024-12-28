@@ -10,12 +10,13 @@ import jwt from "jsonwebtoken";
 
 import { emailQueue, emailQueueName } from "../jobs/EmailJobs.js";
 import prisma from "../config/database.js";
+import authMiddleware from "../middleware/AuthMiddleware.js";
 
 const router = Router();
 
 // * Login route
 
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response): Promise<void> => {
   try {
     const body = req.body;
     const payload = loginschema.parse(body);
@@ -24,35 +25,46 @@ router.post("/login", async (req: Request, res: Response) => {
       where: {
         email: payload.email,
       },
-    })
+    });
 
-    if(!user || user ===null)
-    {
-      return res.status(422).json({
+    if (!user || user === null) {
+      res.status(422).json({
         errors: {
           message: "No user found with this email",
         },
-      })
-
+      });
+      return;
     }
 
     //* check password
-    const compare = await bcrypt.compare(payload.password, user.password)
-    if(!compare)
-    {
-      return res.status(422).json({
+    const compare = await bcrypt.compare(payload.password, user.password);
+    if (!compare) {
+      res.status(422).json({
         errors: {
           message: "Invalid Credentials",
         },
-      })
+      });
+      return;
     }
 
     // * JWT payload
-    const JWTpayload = {
-      id:user.id,
-      name:user.name,
-      email:user.email
-    }
+    let JWTpayload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+
+    const token = jwt.sign(JWTpayload, process.env.SECRET_KEY!, {
+      expiresIn: "365d",
+    });
+    res.json({
+      message: "Login successful",
+      data: {
+        ...JWTpayload,
+        token: `Bearer ${token}`,
+      },
+    });
+    return;
   } catch (error) {
     if (error instanceof ZodError) {
       const errors = formateError(error);
@@ -65,6 +77,63 @@ router.post("/login", async (req: Request, res: Response) => {
     }
   }
 });
+
+//* Login Check route
+
+router.post(
+  "/check/credentials",
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const body = req.body;
+      const payload = loginschema.parse(body);
+      // * check email
+      let user = await prisma.user.findUnique({
+        where: {
+          email: payload.email,
+        },
+      });
+
+      if (!user || user === null) {
+        res.status(422).json({
+          errors: {
+            message: "No user found with this email",
+          },
+        });
+        return;
+      }
+
+      //* check password
+      const compare = await bcrypt.compare(payload.password, user.password);
+      if (!compare) {
+        res.status(422).json({
+          errors: {
+            message: "Invalid Credentials",
+          },
+        });
+        return;
+      }
+
+      res.json({
+        message: "Login successful",
+        data: {},
+      });
+      return;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = formateError(error);
+        res.status(422).json({ message: "Invalid data", errors });
+      } else {
+        console.error({ type: "Register Error", body: JSON.stringify(error) });
+        res
+          .status(500)
+          .json({
+            error: "Something went wrong.please try again!",
+            data: error,
+          });
+      }
+    }
+  }
+);
 
 // * Register route
 
@@ -128,6 +197,15 @@ router.post("/register", async (req: Request, res: Response) => {
         .json({ error: "Something went wrong.please try again!", data: error });
     }
   }
+});
+
+// * get user
+
+router.get("/user", authMiddleware, async (req: Request, res: Response) => {
+  const user = req.user;
+  return res.json({
+    data: user,
+  });
 });
 
 export default router;

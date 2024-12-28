@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Login from "@/components/auth/Login";
 
 export default async function login() {
 
@@ -17,23 +18,7 @@ export default async function login() {
           </h1>
           <h1 className="text-3xl font-bold">Login</h1>
           <p>Welcome back</p>
-          <form >
-            <div className="mt-4">
-                <label htmlFor="email">Email</label>
-                <Input id="email" type="email" name="email" placeholder="Enter your email"></Input>
-            </div>
-            <div className="mt-4">
-                <label htmlFor="password">Password</label>
-                <Input id="password" type="password" name="password" placeholder="Enter your password"></Input>
-            </div>
-            <div className="text-right font-bold">
-            <Link href="forget-password" className="text-right">Forget Password?</Link>
-
-            </div>
-            <div className="mt-4">
-                <Button className="w-full">Submit</Button>
-            </div>
-          </form>
+          <Login></Login>
 
         </div>
        
