@@ -9,7 +9,6 @@ import Routes from "./routes/index.js";
 import fileUpload from "express-fileupload";
 
 
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app: Application = express();
 const PORT = process.env.PORT || 7000;

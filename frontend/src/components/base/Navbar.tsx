@@ -21,8 +21,8 @@ function Navbar() {
   return (
     <>
     <LogoutModel open={open} setOpen={setOpen}></LogoutModel>
-    <nav className="flex justify-between items-center h-14 p-2 w-full ">
-      <h1 className="text-4xl  font-extrabold bg-gradient-to-r from-pink-400 to-purple-500 text-transparent bg-clip-text">
+    <nav className="flex justify-between items-center h-14 p-2  w-full">
+    <h1 className="text-4xl font-extrabold bg-gradient-to-r from-pink-400 to-purple-500 text-transparent bg-clip-text">
         Clash
       </h1>
 
