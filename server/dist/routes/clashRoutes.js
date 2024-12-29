@@ -10,6 +10,9 @@ router.get("/", async (req, res) => {
             where: {
                 user_id: req.user?.id,
             },
+            orderBy: {
+                id: "desc"
+            }
         });
         res.json({ message: "Clash Fetched Successfully", data: clash });
         return;

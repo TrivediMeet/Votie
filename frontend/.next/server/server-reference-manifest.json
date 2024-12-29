@@ -31,8 +31,16 @@
       "layer": {
         "app/(auth)/login/page": "action-browser"
       }
+    },
+    "9e01d402495e4c577eb958edfba09c103345431b": {
+      "workers": {
+        "app/dashboard/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22E%3A%5C%5CProjects%5C%5CVotiee%5C%5Cfrontend%5C%5Csrc%5C%5Cactions%5C%5CCommonActions.ts%22%2C%5B%22clearCashe%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/dashboard/page": "action-browser"
+      }
     }
   },
   "edge": {},
-  "encryptionKey": "bzvHkvJgvYzhMuqbW6AdZthzHdog5luxk6BqjSZo5w0="
+  "encryptionKey": "3slA6a5DmMW0dlR6em6Tzb+LeQbmwQYIOmvyX+Ln6uQ="
 }

@@ -214,6 +214,7 @@ import axios, { AxiosError } from "axios";
 import { CLASH_URL } from "@/lib/apiEndPoints";
 import { toast } from "sonner";
 import { CustomUser } from "@/app/api/auth/[...nextauth]/options";
+import { clearCashe } from "@/actions/CommonActions";
 
 export default function AddClash({ user }: { user: CustomUser }) {
   const [open, setOpen] = useState(false);
@@ -246,9 +247,11 @@ export default function AddClash({ user }: { user: CustomUser }) {
       });
       setLoading(false);
       if (data?.message) {
+        clearCashe("dashboard");
         setClashData({});
         setDate(null);
         setErrors({});
+        setImage(null);
         toast.success(data?.message);
         setOpen(false);
       }

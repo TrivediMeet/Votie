@@ -9,7 +9,7 @@ export async function fetchClashs(token:string){
 
         next:{
             revalidate:60*60,
-            tags:["dashboard"]
+            tags:["dashboard"],
         }
     })
 
