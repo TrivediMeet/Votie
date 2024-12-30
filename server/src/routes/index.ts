@@ -10,6 +10,6 @@ router.use("/api/auth", AuthRoutes);
 router.use("/api/auth", passwordRoutes);
 router.use("/", verifyRoutes);
 
-router.use("/api/clash",authMiddleware,ClashRoutes);
+router.use("/api/clash",ClashRoutes);
 
 export default router;

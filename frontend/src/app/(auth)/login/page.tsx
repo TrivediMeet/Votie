@@ -3,12 +3,17 @@ import React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogIn } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/options'
 import Login from "@/components/auth/Login";
 
 export default async function login() {
+  const session = await getServerSession(authOptions)
 
+  if(session)
+  {
+    redirect("/dashboard")
+  }
   return (
     <div className="flex justify-center items-center h-screen ">
       <div className="w-full md:w-[550px] shadow-md rounded-xl py-5 px-10 bg-white">

@@ -8,10 +8,17 @@ import { Input } from "@/components/ui/input";
 import { registerAction } from "@/actions/authActions";
 import { SubmitButton } from "@/components/common/SubmitButton";
 import Register from "@/components/auth/Register";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 
 export default async function register() {
+ const session = await getServerSession(authOptions)
  
+   if(session)
+   {
+     redirect("/dashboard")
+   }
   return (
     <div className="flex justify-center items-center h-screen ">
       <div className="w-full px-10 md:w-[550px] shadow-md rounded-xl py-5 bg-white">

@@ -3,8 +3,9 @@ import { ZodError } from "zod";
 import { formateError, imageValidator, removeImage, uploadFile, } from "../helper.js";
 import { clashSchema } from "../validation/clashValidation.js";
 import prisma from "../config/database.js";
+import authMiddleware from "../middleware/AuthMiddleware.js";
 const router = Router();
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
     try {
         const clash = await prisma.clash.findMany({
             where: {
@@ -38,7 +39,7 @@ router.get("/:id", async (req, res) => {
         return;
     }
 });
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
     try {
         const body = req.body;
         const payload = clashSchema.parse(body);
@@ -80,7 +81,7 @@ router.post("/", async (req, res) => {
         }
     }
 });
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         const body = req.body;
@@ -130,7 +131,7 @@ router.put("/:id", async (req, res) => {
         }
     }
 });
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         // * Get Old Image Name
@@ -158,5 +159,8 @@ router.delete("/:id", async (req, res) => {
         res.status(500).json({ error: "Something went wrong" });
         return;
     }
+});
+// * Clash Item Routes
+router.post("/items", authMiddleware, async (req, res) => {
 });
 export default router;
