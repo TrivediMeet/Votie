@@ -15,7 +15,10 @@ export default async function clashItems({
   params: { id: number };
 }) {
   const session: CustomSession | null = await getServerSession(authOptions);
-  const clash: ClashType | null = await fetchClash(params.id,session?.user?.token!);
+  const clash: ClashType | null = await fetchClash(
+    params.id,
+    session?.user?.token!
+  );
   console.log(clash);
   return (
     <div className="container">
@@ -24,6 +27,8 @@ export default async function clashItems({
         <h1 className="text-2xl lg:text-4xl font-extrabold">{clash?.title}</h1>
         <p className="text-lg">{clash?.description}</p>
       </div>
+
+      <AddClashItems token={session?.user?.token!} clashId={params.id}></AddClashItems>
     </div>
   );
 }
