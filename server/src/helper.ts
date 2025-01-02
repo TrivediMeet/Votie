@@ -63,7 +63,7 @@ export const renderEmailEjs = async (fileName: string, payload: any) => {
     return bytes / (1024 * 1024);
   }
 
-  export const uploadFile = async (image:UploadedFile) =>{
+  export const uploadFile =  (image:UploadedFile) =>{
 
     const imgExt = image?.name.split(".")
     const imageName = uuid4() + "." + imgExt[1]

@@ -8,6 +8,7 @@ import AddClashItems from "@/components/clash/AddClashItems";
 // import ViewClashItems from "@/components/clash/ViewClashItems";
 import { getServerSession } from "next-auth";
 import React from "react";
+import ViewClashItems from "@/components/clash/ViewClashItems";
 
 export default async function clashItems({
   params,
@@ -16,8 +17,7 @@ export default async function clashItems({
 }) {
   const session: CustomSession | null = await getServerSession(authOptions);
   const clash: ClashType | null = await fetchClash(
-    params.id,
-    session?.user?.token!
+    params.id
   );
   console.log(clash);
   return (
@@ -28,7 +28,15 @@ export default async function clashItems({
         <p className="text-lg">{clash?.description}</p>
       </div>
 
-      <AddClashItems token={session?.user?.token!} clashId={params.id}></AddClashItems>
+
+      {clash?.ClashItem && clash.ClashItem.length > 0 ? (
+        <ViewClashItems clash={clash}></ViewClashItems>
+      ) : (
+        <AddClashItems
+          token={session?.user?.token!}
+          clashId={params?.id.toString()}
+        />
+      )}
     </div>
   );
 }

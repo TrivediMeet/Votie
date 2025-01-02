@@ -11,6 +11,8 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import dynamic from "next/dynamic";
 import DeleteClash from "./DeleteClash";
+import Env from "@/lib/env";
+import { toast } from "sonner";
 
 const EditClash = dynamic(() => import("./EditClash"));
 
@@ -18,6 +20,11 @@ function ClashCardMenu({ clash, token }: { clash: ClashType; token: string }) {
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+
+  const handleCopy = () =>{
+    navigator.clipboard?.writeText(`${Env.APP_URL}/clash/${clash.id}`);
+    toast.success("Link copied to clipboard");
+  }
   return (
     <>
       {open && (
@@ -54,7 +61,7 @@ function ClashCardMenu({ clash, token }: { clash: ClashType; token: string }) {
           >
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem>Copy Link</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCopy}>Copy Link</DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               setDeleteOpen(true);

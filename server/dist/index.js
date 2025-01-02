@@ -6,12 +6,25 @@ import { fileURLToPath } from 'url';
 import ejs from "ejs";
 import Routes from "./routes/index.js";
 import fileUpload from "express-fileupload";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import { setupSocket } from "./socket.js";
+import helmet from "helmet";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 7000;
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: process.env.CLIENT_APP_URL,
+    }
+});
+export { io };
+setupSocket(io);
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(appLimiter);
 app.use(fileUpload({
@@ -43,4 +56,4 @@ import "./jobs/EmailJobs.js";
 import { emailQueue, emailQueueName } from "./jobs/EmailJobs.js";
 import { appLimiter } from "./config/rate_limit.js";
 // Start the server
-app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
+server.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));

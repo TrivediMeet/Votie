@@ -7,7 +7,7 @@ import {
   uploadFile,
 } from "../helper.js";
 import { clashSchema } from "../validation/clashValidation.js";
-import { UploadedFile } from "express-fileupload";
+import { FileArray, UploadedFile } from "express-fileupload";
 import prisma from "../config/database.js";
 import authMiddleware from "../middleware/AuthMiddleware.js";
 
@@ -21,7 +21,8 @@ router.get("/", authMiddleware,async (req: Request, res: Response) => {
       },
       orderBy:{
         id:"desc"
-      }
+      },
+
     });
     res.json({ message: "Clash Fetched Successfully", data: clash });
     return;
@@ -38,6 +39,26 @@ router.get("/:id", async (req: Request, res: Response) => {
       where: {
         id: Number(id),
       },
+      include: {
+        ClashItem:{
+          select:{
+            image:true,
+            id:true,
+            count:true
+          },
+        },
+
+        ClashComments:{
+          select:{
+            id:true,
+            comment:true,
+            created_at:true,
+          },
+          orderBy:{
+            id:"desc"
+          }
+        }
+      }
     });
     res.json({ message: "Clash Fetched Successfully", data: clash });
     return;
@@ -187,10 +208,111 @@ router.delete("/:id", authMiddleware,async (req: Request, res: Response) => {
 
 // * Clash Item Routes
 
-router.post("/items",authMiddleware,async(req:Request,res:Response)=>{
-  
+// router.post("/items",authMiddleware,async(req:Request,res:Response)=>{
 
-})
+//   const {id} = req.body;
+//   const files:FileArray | null| undefined = req.files
+
+//   let imgErrors:Array<string> = []
+
+//   const images = files?.["images[]"] as UploadedFile[]
+
+//   if(images.length>= 2)
+//   {
+//     // * check validations
+//     images.map((img)=>{
+//       const validMsg = imageValidator(img?.size,img?.mimetype)
+
+//       if(validMsg)
+//       {
+//         imgErrors.push(validMsg)
+//       }
+//     })
+
+//     if(imgErrors.length>0)
+//     {
+//       res.status(422).json({errors:imgErrors})
+//       return
+//     }
+
+//     //* Upload Images to items
+
+//     let uploadedImages:string[] = []
+//     images.map((img)=>{
+
+//       uploadedImages.push(uploadFile(img) )
+//     })
+
+//     // * Save Images to Database
+
+//     uploadedImages.map(async (item) =>{
+//       await prisma.clashItem.create({
+//         data:{
+//           image:item,
+//           clash_id:Number(id),
+//         }
+//       })
+//     })
+
+//      res.status(200).json({message:"Clash Items Uploaded Successfully"})
+//      return
+//   }
+
+//    res.status(422).json({errors:["Please Select at least two images for Clshing"]})
+//    return
+
+// })
+
+router.post("/items", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const files:FileArray | null| undefined = req.files
+    let imgErros: Array<string> = [];
+    const images = files?.["images[]"] as UploadedFile[];
+    if (images.length >= 2) {
+      // * Check validation
+      images.map((img) => {
+        const validMsg = imageValidator(img?.size, img?.mimetype);
+        if (validMsg) {
+          imgErros.push(validMsg);
+        }
+      });
+      if (imgErros.length > 0) {
+         res.status(422).json({ errors: imgErros });
+         return
+      }
+
+      // * Upload images to items
+      let uploadedImages: string[] = [];
+      images.map((img) => {
+        uploadedImages.push(uploadFile(img));
+      });
+
+      uploadedImages.map(async (item) => {
+        await prisma.clashItem.create({
+          data: {
+            image: item,
+            clash_id: Number(id),
+          },
+        });
+      });
+
+       res.json({ message: "Clash Items updated successfully!" });
+       return
+    }
+
+     res
+      .status(404)
+      .json({ message: "Please select at least 2 images for clashing." });
+      return
+  } catch (error) {
+    // logger.error({ type: "Clash Item", body: JSON.stringify(error) });
+     res
+      .status(500)
+      .json({ message: "Something went wrong.please try again" });
+      return
+  }
+});
 
 
 export default router;

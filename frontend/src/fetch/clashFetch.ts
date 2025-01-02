@@ -30,30 +30,38 @@ export async function fetchClashs(token:string){
 }
 
 
-export async function fetchClash(id:number,token:string){
-    console.log(CLASH_URL)
-    console.log(token)
 
-    const res = await fetch(`${CLASH_URL}/${id}`, {
-        
-        cache: "no-cache",
-    });
-
-   
-        if (!res.ok) {
-            const errorMessage = await res.text();
-            throw new Error(`Failed to fetch data: ${errorMessage}`);
-        }
-        
+// export async function fetchClash(id: number) {
+//     const res = await fetch(`${CLASH_URL}/${id}`, {
+//       cache: "no-cache",
+//     });
     
+//     console.log(res)
+//     if (!res.ok) {
+//       // This will activate the closest `error.js` Error Boundary
+//       throw new Error("Failed to fetch data");
+//     }
+//     const response = await res.json();
+//     if (response?.data) {
+//       return response?.data;
+//     }
+//     return null;
+//   }
 
-    const responece = await res.json()
 
-    if(responece?.data)
-    {
-        return responece?.data
+export async function fetchClash(id: number) {
+    const res = await fetch(`${CLASH_URL}/${id}`, {
+      cache: "no-cache",
+    });
+    
+    console.log(res)
+    if (!res.ok) {
+      // This will activate the closest `error.js` Error Boundary
+      throw new Error("Failed to fetch data");
+    }
+    const response = await res.json();
+    if (response?.data) {
+      return response?.data;
     }
     return null;
-
-    
-}
+  }
